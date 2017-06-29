@@ -36,10 +36,10 @@ def release_published(release, repo):
         notes = "No release notes."
 
     if config.CONFLUENCE_API:
-        Update_confluence.delay(title, notes, project_name)
+        Update_confluence(title, notes, project_name)
 
     if config.SLACK_WEBHOOK:
-        notify_slack.delay(title, notes, project_name)
+        notify_slack(title, notes, project_name)
 
 
 def Update_confluence(title, notes, project_name):
