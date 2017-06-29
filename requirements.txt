@@ -1,0 +1,4 @@
+flask>=0.12
+uwsgi==2.0.15
+requests>=2.18
+markdown>=2.6.8
