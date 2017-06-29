@@ -19,3 +19,4 @@ CONFLUENCE_PASS = env.get("CONFLUENCE_PASS")
 
 # Styling
 PRETTY_NAMES = {}  # short_repo_nema: "PrettyName"
+RELEASE_NAME = "{title} {project}"

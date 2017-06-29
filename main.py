@@ -28,7 +28,7 @@ def validate_signature():
 def release_published(release, repo):
     logger.debug("New release: %s", release["tag_name"])
 
-    project_name = config.PRETTY_NAMES.get(repo["name"], repo["name"])
+    project = config.PRETTY_NAMES.get(repo["name"], repo["name"])
 
     title = release["tag_name"]
     if not release["body"]:
@@ -36,13 +36,13 @@ def release_published(release, repo):
         notes = "No release notes."
 
     if config.CONFLUENCE_API:
-        Update_confluence(title, notes, project_name)
+        Update_confluence(title, notes, project)
 
     if config.SLACK_WEBHOOK:
-        notify_slack(title, notes, project_name)
+        notify_slack(title, notes, project)
 
 
-def Update_confluence(title, notes, project_name):
+def Update_confluence(title, notes, project):
     logger.info("Creating confluence relase notes for: %s", title)
 
     auth = (config.CONFLUENCE_USER, config.CONFLUENCE_PASS)
@@ -50,7 +50,7 @@ def Update_confluence(title, notes, project_name):
     blog_post = {
         "space": {'key': config.CONFLUENCE_SPACE},
         'type': 'blogpost',
-        "title": "{} {}".format(title, project_name),
+        "title": config.RELEASE_NAME.format(title=title, project=project),
         'body': {
             'storage': {
                 'representation': 'storage',
@@ -65,17 +65,17 @@ def Update_confluence(title, notes, project_name):
 
     content_url = res.json()["_links"]["self"]
     labels = [{"prefix": "global", "name": "release"},
-              {"prefix": "global", "name": project_name.lower()}]
+              {"prefix": "global", "name": project.lower()}]
 
     res = post(content_url + "/label", auth=auth, json=labels)
     if res.status_code != 200:
         raise Exception("Blog post labelling failed: {}".res.content)
 
 
-def notify_slack(title, notes, project_name):
+def notify_slack(title, notes, project):
     logger.info("Notifying slack about relase: %s", title)
 
-    long_title = "{} {}".format(title, project_name)
+    long_title = config.RELEASE_NAME.format(title=title, project=project)
     payload = {
         'color': '#439FE0',
         'fallback': "New Release: {}".format(long_title),
