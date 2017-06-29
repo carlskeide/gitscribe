@@ -7,8 +7,6 @@ services:
         command: uwsgi ./uwsgi.ini
 
         environment:
-            CELERY_BROKER: "redis://redis"
-
             GITHUB_WEBHOOK_SECRET: ""
 
             CONFLUENCE_API: ""
@@ -17,6 +15,3 @@ services:
             CONFLUENCE_PASS: ""
 
             SLACK_WEBHOOK: ""
-
-        ports:
-            - "5000"
