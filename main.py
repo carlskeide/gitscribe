@@ -38,6 +38,9 @@ def release_published(release, repo):
     if config.CONFLUENCE_API:
         Update_confluence.delay(title, notes, project_name)
 
+    if config.SLACK_WEBHOOK:
+        notify_slack.delay(title, notes, project_name)
+
 
 def Update_confluence(title, notes, project_name):
     logger.info("Creating confluence relase notes for: %s", title)
@@ -67,6 +70,30 @@ def Update_confluence(title, notes, project_name):
     res = post(content_url + "/label", auth=auth, json=labels)
     if res.status_code != 200:
         raise Exception("Blog post labelling failed: {}".res.content)
+
+
+def notify_slack(title, notes, project_name):
+    logger.info("Notifying slack about relase: %s", title)
+
+    long_title = "{} {}".format(title, project_name)
+    payload = {
+        'color': '#439FE0',
+        'fallback': "New Release: {}".format(long_title),
+        "pretext": "A new release has been created",
+        'title': long_title,
+        'fields': [
+            {
+                'title': 'Release notes',
+                'value': notes,
+                'short': False
+            }
+        ],
+        'mrkdwn_in': ['text', 'fields']
+    }
+
+    res = post(config.SLACK_WEBHOOK, json={"attachments": payload})
+    if res.status_code != 200:
+        raise Exception("Slack notification failed: {}".res.content)
 
 
 @app.route('/', methods=['POST'])
