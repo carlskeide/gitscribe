@@ -31,7 +31,10 @@ def release_published(release, repo):
     project = config.PRETTY_NAMES.get(repo["name"], repo["name"])
 
     title = release["tag_name"]
-    if not release["body"]:
+    if release["body"]:
+        notes = release["body"]
+
+    else:
         logger.warning("Empty release notes")
         notes = "No release notes."
 
@@ -61,7 +64,7 @@ def Update_confluence(title, notes, project):
     res = post(config.CONFLUENCE_API + "/content", auth=auth, json=blog_post)
 
     if res.status_code != 200:
-        raise Exception("Blog post creation failed with: {}".res.content)
+        raise Exception("Blog post creation failed with: {}".format(res.content))
 
     content_url = res.json()["_links"]["self"]
     labels = [{"prefix": "global", "name": "release"},
@@ -69,7 +72,7 @@ def Update_confluence(title, notes, project):
 
     res = post(content_url + "/label", auth=auth, json=labels)
     if res.status_code != 200:
-        raise Exception("Blog post labelling failed: {}".res.content)
+        raise Exception("Blog post labelling failed: {}".format(res.content))
 
 
 def notify_slack(title, notes, project):
@@ -91,9 +94,9 @@ def notify_slack(title, notes, project):
         'mrkdwn_in': ['text', 'fields']
     }
 
-    res = post(config.SLACK_WEBHOOK, json={"attachments": payload})
+    res = post(config.SLACK_WEBHOOK, json={"attachments": [payload, ]})
     if res.status_code != 200:
-        raise Exception("Slack notification failed: {}".res.content)
+        raise Exception("Slack notification failed: {}".format(res.content))
 
 
 @app.route('/', methods=['POST'])
