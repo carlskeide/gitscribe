@@ -28,8 +28,7 @@ def validate_signature():
 def release_published(release, repo):
     logger.debug("New release: %s", release["tag_name"])
 
-    project = config.PRETTY_NAMES.get(repo["name"], repo["name"])
-
+    project = repo["name"].title()
     title = release["tag_name"]
     if release["body"]:
         notes = release["body"]
