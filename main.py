@@ -80,8 +80,8 @@ def notify_slack(title, notes, project):
     long_title = config.RELEASE_NAME.format(title=title, project=project)
     payload = {
         'color': '#439FE0',
-        'fallback': "New Release: {}".format(long_title),
-        "pretext": "A new release has been created",
+        'fallback': "New release notes: {}".format(long_title),
+        "pretext": "New release notes have been published",
         'title': long_title,
         'fields': [
             {
