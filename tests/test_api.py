@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from gitscribe import app
 
-from . import TestCase, skip
+from . import TestCase, patch
 
 
 class TestAPI(TestCase):
