@@ -9,9 +9,9 @@ class TestAPI(TestCase):
         app.config['TESTING'] = True
         self.client = app.test_client()
 
-    @patch("githubflow.release_published")
-    @patch("githubflow.settings")
-    @patch("githubflow.validate_signature")
+    @patch("gitscribe.release_published")
+    @patch("gitscribe.settings")
+    @patch("gitscribe.validate_signature")
     def test_webhook(self, mock_validate, mock_settings, mock_release):
         res = self.client.get('/')
         self.assertEqual(res.status_code, 405)
