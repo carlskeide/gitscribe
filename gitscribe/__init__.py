@@ -8,21 +8,13 @@ from requests import post
 from markdown import markdown
 
 from . import settings
+from .utils import validate_signature
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.from_object(settings.FlaskConfig)
-
-
-def validate_signature():
-    logger.debug("Validating request digest")
-
-    mode, digest = request.headers["X-Hub-Signature"].split('=')
-    real_hmac = hmac.new(settings.WEBHOOK_SECRET, request.data, mode)
-    if not hmac.compare_digest(digest, real_hmac.hexdigest()):
-        raise ValueError("Invalid HMAC")
 
 
 def release_published(release, repo):
@@ -100,8 +92,11 @@ def notify_slack(title, notes, project):
 
 @app.route('/', methods=['POST'])
 def handle_webhook():
+    if not settings.IS_CONFIGURED:
+        abort(500)
+
     try:
-        validate_signature()
+        validate_signature(request)
 
     except Exception:
         logger.exception("Refusing request, bad digest")
@@ -111,6 +106,8 @@ def handle_webhook():
         delivery = request.headers["X-GitHub-Delivery"]
         event = request.headers["X-GitHub-Event"]
         payload = request.get_json()
+        if not payload:
+            raise ValueError("Empty payload")
 
     except Exception:
         logger.exception("Invalid request")
