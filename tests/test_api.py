@@ -41,7 +41,7 @@ class TestAPI(TestCase):
         self.assertEqual(res.status_code, 200)
         mock_release.assert_not_called()
 
-        request_headers["X-GitHub-Event"] = "pull_request"
+        request_headers["X-GitHub-Event"] = "release"
         res = self.client.post('/', headers=request_headers, json=request_body)
         self.assertEqual(res.status_code, 200)
         mock_release.assert_called_with("some-release", "some-repo")
