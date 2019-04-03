@@ -18,5 +18,5 @@ __pycache__/
 media/
 static/
 
-docker-compose.yml
 .env
+.coverage

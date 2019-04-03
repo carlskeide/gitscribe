@@ -7,20 +7,20 @@ from flask import Flask, request, abort
 from requests import post
 from markdown import markdown
 
-import config
+from . import settings
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.config.from_object(config.FlaskConfig)
+app.config.from_object(settings.FlaskConfig)
 
 
 def validate_signature():
     logger.debug("Validating request digest")
 
     mode, digest = request.headers["X-Hub-Signature"].split('=')
-    real_hmac = hmac.new(config.WEBHOOK_SECRET, request.data, mode)
+    real_hmac = hmac.new(settings.WEBHOOK_SECRET, request.data, mode)
     if not hmac.compare_digest(digest, real_hmac.hexdigest()):
         raise ValueError("Invalid HMAC")
 
@@ -37,22 +37,22 @@ def release_published(release, repo):
         logger.warning("Empty release notes")
         notes = "No release notes."
 
-    if config.CONFLUENCE_API:
+    if settings.CONFLUENCE_API:
         Update_confluence(title, notes, project)
 
-    if config.SLACK_WEBHOOK:
+    if settings.SLACK_WEBHOOK:
         notify_slack(title, notes, project)
 
 
 def Update_confluence(title, notes, project):
     logger.info("Creating confluence relase notes for: %s", title)
 
-    auth = (config.CONFLUENCE_USER, config.CONFLUENCE_PASS)
+    auth = (settings.CONFLUENCE_USER, settings.CONFLUENCE_PASS)
 
     blog_post = {
-        "space": {'key': config.CONFLUENCE_SPACE},
+        "space": {'key': settings.CONFLUENCE_SPACE},
         'type': 'blogpost',
-        "title": config.RELEASE_NAME.format(title=title, project=project),
+        "title": settings.RELEASE_NAME.format(title=title, project=project),
         'body': {
             'storage': {
                 'representation': 'storage',
@@ -60,7 +60,7 @@ def Update_confluence(title, notes, project):
             }
         }
     }
-    res = post(config.CONFLUENCE_API + "/content", auth=auth, json=blog_post)
+    res = post(settings.CONFLUENCE_API + "/content", auth=auth, json=blog_post)
 
     if res.status_code != 200:
         raise Exception("Blog post creation failed with: {}".format(res.content))
@@ -77,7 +77,7 @@ def Update_confluence(title, notes, project):
 def notify_slack(title, notes, project):
     logger.info("Notifying slack about relase: %s", title)
 
-    long_title = config.RELEASE_NAME.format(title=title, project=project)
+    long_title = settings.RELEASE_NAME.format(title=title, project=project)
     payload = {
         'color': '#439FE0',
         'fallback': "New release notes: {}".format(long_title),
@@ -93,7 +93,7 @@ def notify_slack(title, notes, project):
         'mrkdwn_in': ['text', 'fields']
     }
 
-    res = post(config.SLACK_WEBHOOK, json={"attachments": [payload, ]})
+    res = post(settings.SLACK_WEBHOOK, json={"attachments": [payload, ]})
     if res.status_code != 200:
         raise Exception("Slack notification failed: {}".format(res.content))
 
