@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
 import logging
-import hmac
 
 from flask import Flask, request, abort
 from requests import post
@@ -55,7 +54,8 @@ def Update_confluence(title, notes, project):
     res = post(settings.CONFLUENCE_API + "/content", auth=auth, json=blog_post)
 
     if res.status_code != 200:
-        raise Exception("Blog post creation failed with: {}".format(res.content))
+        raise Exception(
+            "Blog post creation failed with: {}".format(res.content))
 
     content_url = res.json()["_links"]["self"]
     labels = [{"prefix": "global", "name": "release"},
