@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='GitScribe',
-    version='1.1.0',
+    version='1.1.1',
 
     description='Automated Release Notes distribution.',
     url='https://github.com/carlskeide/gitscribe/',
