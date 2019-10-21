@@ -16,4 +16,4 @@ markupsafe==1.1.1         # via jinja2
 requests==2.21.0
 urllib3==1.24.1           # via requests
 uwsgi==2.0.17
-werkzeug==0.15.2          # via flask
+werkzeug==0.15.3          # via flask
