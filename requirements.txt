@@ -4,16 +4,29 @@
 #
 #    pip-compile --upgrade --output-file requirements.txt requirements.in
 #
-certifi==2019.3.9         # via requests
-chardet==3.0.4            # via requests
-click==7.0                # via flask
+certifi==2019.3.9
+    # via requests
+chardet==3.0.4
+    # via requests
+click==7.0
+    # via flask
 flask==1.0.2
-idna==2.8                 # via requests
-itsdangerous==1.1.0       # via flask
-jinja2==2.10.1            # via flask
+    # via -r requirements.in
+idna==2.8
+    # via requests
+itsdangerous==1.1.0
+    # via flask
+jinja2==2.11.3
+    # via flask
 markdown==3.1
-markupsafe==1.1.1         # via jinja2
+    # via -r requirements.in
+markupsafe==1.1.1
+    # via jinja2
 requests==2.21.0
-urllib3==1.24.1           # via requests
+    # via -r requirements.in
+urllib3==1.24.1
+    # via requests
 uwsgi==2.0.17
-werkzeug==0.15.2          # via flask
+    # via -r requirements.in
+werkzeug==0.15.2
+    # via flask
